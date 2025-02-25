@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script>
+        async function generateQR() {
+            const url = document.getElementById("url").value;
+            if (!url) return alert("Enter a valid URL!");
+
+            const response = await fetch(`/generateQR?url=${encodeURIComponent(url)}`);
+            const blob = await response.blob();
+            const qrImage = URL.createObjectURL(blob);
+
+            document.getElementById("qrcode").src = qrImage;
+            document.getElementById("download").href = qrImage;
+            document.getElementById("download").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <h1>QR Code Generator</h1>
+    <input type="text" id="url" placeholder="Enter URL">
+    <button onclick="generateQR()">Generate</button>
+    <br><br>
+    <img id="qrcode" alt="QR Code">
+    <br>
+    <a id="download" download="qrcode.png" style="display: none;">Download QR Code</a>
+</body>
+</html>

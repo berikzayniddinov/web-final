@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator</title>
+</head>
+<body>
+    <h2>BMI Calculator</h2>
+    
+    <form id="bmiForm">
+        <label>Weight (kg): <input type="number" id="weight" required></label><br><br>
+        <label>Height (m): <input type="number" id="height" step="0.01" required></label><br><br>
+        <button type="submit">Calculate BMI</button>
+    </form>
+
+    <h3 id="result"></h3>
+
+    <script>
+        document.getElementById("bmiForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const weight = document.getElementById("weight").value;
+            const height = document.getElementById("height").value;
+
+            const response = await fetch("/bmi", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ weight, height }),
+            });
+
+            const data = await response.json();
+
+            if (data.error) {
+                document.getElementById("result").textContent = "Error: " + data.error;
+            } else {
+                document.getElementById("result").textContent = `Your BMI is: ${data.bmi}`;
+            }
+        });
+    </script>
+</body>
+</html>

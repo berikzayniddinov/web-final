@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <script>
+        async function getWeather() {
+            const city = document.getElementById("city").value;
+            if (!city) return alert("Enter a city!");
+
+            const response = await fetch(`/weather?city=${city}`);
+            const data = await response.json();
+
+            if (data.error) {
+                document.getElementById("weatherInfo").innerHTML = `<p>${data.error}</p>`;
+                return;
+            }
+
+            document.getElementById("weatherInfo").innerHTML = `
+                <h2>Weather in ${city}</h2>
+                <p><strong>Temperature:</strong> ${data.temperature}°C</p>
+                <p><strong>Description:</strong> ${data.description}</p>
+                <img src="${data.icon}" alt="Weather Icon">
+                <p><strong>Feels Like:</strong> ${data.feels_like}°C</p>
+                <p><strong>Humidity:</strong> ${data.humidity}%</p>
+                <p><strong>Pressure:</strong> ${data.pressure} hPa</p>
+                <p><strong>Wind Speed:</strong> ${data.wind_speed} m/s</p>
+                <p><strong>Coordinates:</strong> [Lat: ${data.coordinates.lat}, Lon: ${data.coordinates.lon}]</p>
+                <p><strong>Air Quality Index (AQI):</strong> ${data.aqi}</p>
+                <p><strong>Country:</strong> ${data.country} <img src="${data.flag}" width="40"></p>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <h1>Weather App</h1>
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+    <div id="weatherInfo"></div>
+</body>
+</html>
