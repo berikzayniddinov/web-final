@@ -16,20 +16,14 @@ const PORT = 3000;
 app.use(bodyParser.json());
 
 app.use(cors());
-
-// ✅ Connect to MongoDB
 mongoose.connect("mongodb://127.0.0.1:27017/auth-system")
     .then(() => console.log("MongoDB Connected"))
     .catch(err => console.error("MongoDB connection error:", err));
-
-// ✅ Define a Mongoose Model
 const ItemSchema = new mongoose.Schema({
     name: String,
     description: String,
 });
 const Item = mongoose.model("Item", ItemSchema);
-
-// ✅ CREATE (Add a new item)
 app.post("/items", async (req, res) => {
     try {
         const newItem = new Item(req.body);
@@ -39,8 +33,6 @@ app.post("/items", async (req, res) => {
         res.status(500).json({ error: "Error creating item" });
     }
 });
-
-// ✅ READ (Get all items)
 app.get("/items", async (req, res) => {
     try {
         const items = await Item.find();
@@ -49,8 +41,6 @@ app.get("/items", async (req, res) => {
         res.status(500).json({ error: "Error fetching items" });
     }
 });
-
-// ✅ UPDATE (Edit an item)
 app.put("/items/:id", async (req, res) => {
     try {
         const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -59,8 +49,6 @@ app.put("/items/:id", async (req, res) => {
         res.status(500).json({ error: "Error updating item" });
     }
 });
-
-// ✅ DELETE (Remove an item)
 app.delete("/items/:id", async (req, res) => {
     try {
         await Item.findByIdAndDelete(req.params.id);
@@ -69,8 +57,6 @@ app.delete("/items/:id", async (req, res) => {
         res.status(500).json({ error: "Error deleting item" });
     }
 });
-
-// BMI Route
 app.post("/bmi", (req, res) => {
     const { weight, height } = req.body;
 
@@ -81,24 +67,19 @@ app.post("/bmi", (req, res) => {
     const bmi = (weight / (height * height)).toFixed(2);
     res.json({ bmi });
 });
-
-// Serve BMI page
 app.get("/bmi", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "bmi.html"));
 });
-
-//weather
-app.use(express.static("public")); // Serve HTML from public folder
+app.use(express.static("public"));
 app.use(express.json());
 
-const OPENWEATHER_API_KEY = "9d3e681a50f5ea11f1e54b4c463f0d24"; // Replace with your API key
+const OPENWEATHER_API_KEY = "9d3e681a50f5ea11f1e54b4c463f0d24";
 
 app.get("/weather", async (req, res) => {
     const city = req.query.city;
     if (!city) return res.status(400).json({ error: "City is required" });
 
     try {
-        // Fetch weather data
         const weatherRes = await fetch(
             `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${OPENWEATHER_API_KEY}&units=metric`
         );
@@ -111,15 +92,11 @@ app.get("/weather", async (req, res) => {
             `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coord.lat}&lon=${coord.lon}&appid=${OPENWEATHER_API_KEY}`
         );
         const aqiData = await aqiRes.json();
-        const aqi = aqiData.list[0].main.aqi; // AQI level (1-5)
-
-        // Fetch country flag from another API
+        const aqi = aqiData.list[0].main.aqi;
         const countryCode = weatherData.sys.country;
         const flagRes = await fetch(`https://restcountries.com/v3.1/alpha/${countryCode}`);
         const flagData = await flagRes.json();
         const flagUrl = flagData[0].flags.png;
-
-        // Send data to frontend
         res.json({
             temperature: weatherData.main.temp,
             description: weatherData.weather[0].description,
@@ -138,10 +115,6 @@ app.get("/weather", async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 });
-
-
-
-//send email
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -167,8 +140,6 @@ app.post("/sendEmail", async (req, res) => {
         res.status(500).send("Failed to send email");
     }
 });
-
-// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(session({
@@ -181,16 +152,11 @@ app.use(session({
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.log(err));
-
-// User Schema
 const UserSchema = new mongoose.Schema({
     username: String,
     password: String,
     createdAt: { type: Date, default: Date.now }
 });
-
-
-//qr-code
 app.get("/generateQR", (req, res) => {
     const url = req.query.url;
     if (!url) return res.status(400).send("URL required");
@@ -202,8 +168,6 @@ app.get("/generateQR", (req, res) => {
 
 
 const User = mongoose.model("User", UserSchema);
-
-// Routes
 app.get("/", (req, res) => {
     if (req.session.user) {
         res.redirect("/main");
@@ -250,6 +214,4 @@ app.get("/logout", (req, res) => {
         res.redirect("/");
     });
 });
-
-// Start Server
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
