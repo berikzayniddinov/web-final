@@ -4,7 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #map { height: 400px; width: 100%; margin-top: 20px; }
+    </style>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
+        let map;
+
         async function getWeather() {
             const city = document.getElementById("city").value;
             if (!city) return alert("Enter a city!");
@@ -30,13 +61,28 @@
                 <p><strong>Air Quality Index (AQI):</strong> ${data.aqi}</p>
                 <p><strong>Country:</strong> ${data.country} <img src="${data.flag}" width="40"></p>
             `;
+
+            // Инициализация карты
+            if (!map) {
+                map = L.map('map').setView([data.coordinates.lat, data.coordinates.lon], 10);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+            } else {
+                map.setView([data.coordinates.lat, data.coordinates.lon], 10);
+            }
+
+            L.marker([data.coordinates.lat, data.coordinates.lon]).addTo(map)
+                .bindPopup(`<b>${city}</b><br>Temperature: ${data.temperature}°C<br>${data.description}`)
+                .openPopup();
         }
     </script>
 </head>
 <body>
-    <h1>Weather App</h1>
-    <input type="text" id="city" placeholder="Enter city name">
-    <button onclick="getWeather()">Get Weather</button>
-    <div id="weatherInfo"></div>
+<h1>Weather App</h1>
+<input type="text" id="city" placeholder="Enter city name">
+<button onclick="getWeather()">Get Weather</button>
+<div id="weatherInfo"></div>
+<div id="map"></div>
 </body>
 </html>

@@ -145,8 +145,8 @@ app.get("/weather", async (req, res) => {
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "rishatnurasyl77@gmail.com",  // Replace with your Gmail
-        pass: "lwyq izmr vcve eusw"      // Use Google App Password here
+        user: "berikbakhtiarovich@gmail.com",
+        pass: "xgnf cvoq sdec qwdb"
     }
 });
 
